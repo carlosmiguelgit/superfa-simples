@@ -102,7 +102,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
                         <span className={`text-sm font-medium ${isDarkMode ? 'text-white/80' : 'text-slate-600'}`}>Recompensa</span>
                       </div>
                       <span className="text-2xl font-bold text-brand-red tracking-tighter">
-                        R$ {activeNotification.value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                        {activeNotification.value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                       </span>
                     </div>
 

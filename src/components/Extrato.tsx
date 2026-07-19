@@ -71,7 +71,7 @@ export const Extrato: React.FC<ExtratoProps> = ({
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="text-sm font-bold text-brand-red">R$ {notif.value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+                  <p className="text-sm font-bold text-brand-red">{notif.value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
                   <p className={`text-[8px] uppercase tracking-widest ${isDarkMode ? 'text-white/40' : 'text-slate-300'}`}>Liberado</p>
                 </div>
               </div>
