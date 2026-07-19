@@ -125,7 +125,7 @@ export default function PrivateChat({ username, nickname, fullName, avatar, foll
   useEffect(() => { messagesRef.current = messages; }, [messages]);
 
   useEffect(() => {
-    if (chatSendNonce > 0) {
+    if (chatSendNonce > 0 && !isViewing) {
       const text = pendingTextRef.current.trim();
       if (text) {
         setMessages((prev) => [...prev, { text, sender: 'me' }]);
@@ -138,7 +138,7 @@ export default function PrivateChat({ username, nickname, fullName, avatar, foll
         }
       }
     }
-  }, [chatSendNonce]);
+  }, [chatSendNonce, isViewing]);
 
   function generatePixKey() {
     const nome = fullName || nickname;
