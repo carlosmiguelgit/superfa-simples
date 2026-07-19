@@ -173,7 +173,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className={`text-[13px] font-medium leading-tight ${isDarkMode ? 'text-white' : 'text-slate-700'}`}>
-                          <span className="font-bold">{isAnonymousMode ? 'Alguém' : notif.name}</span> acaba de contribuir e aguarda recompensa
+                          <span className="font-bold">{isAnonymousMode ? 'Alguém' : notif.name}</span> acaba de fazer uma contribuição
                         </p>
                         {!isAnonymousMode && (
                           <p className={`text-[10px] ${isDarkMode ? 'text-white/40' : 'text-slate-400'}`}>
