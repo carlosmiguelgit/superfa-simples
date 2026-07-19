@@ -28,20 +28,28 @@ export const Dashboard: React.FC<DashboardProps> = ({
 }) => {
   const [activeNotification, setActiveNotification] = useState<Notification | null>(null);
   const [ressarcindo, setRessarcindo] = useState(false);
-  const [cancelado, setCancelado] = useState(false);
+  const [ressarcido, setRessarcido] = useState(false);
   const [libertando, setLibertando] = useState(false);
   const [recompensaEnviada, setRecompensaEnviada] = useState(false);
 
   useEffect(() => {
-    if (cancelado && activeNotification) {
-      const t = setTimeout(() => {
-        onRessarcir?.(activeNotification);
-        setRessarcindo(false);
-        setCancelado(false);
-      }, 1500);
-      return () => clearTimeout(t);
-    }
-  }, [cancelado, activeNotification, onRessarcir]);
+    if (!ressarcindo) return;
+    const t = setTimeout(() => {
+      setRessarcindo(false);
+      setRessarcido(true);
+    }, 3000);
+    return () => clearTimeout(t);
+  }, [ressarcindo]);
+
+  useEffect(() => {
+    if (!ressarcido || !activeNotification) return;
+    const t = setTimeout(() => {
+      onRessarcir?.(activeNotification);
+      setRessarcido(false);
+      setActiveNotification(null);
+    }, 1500);
+    return () => clearTimeout(t);
+  }, [ressarcido, activeNotification, onRessarcir]);
 
   useEffect(() => {
     if (!libertando) return;
@@ -64,9 +72,6 @@ export const Dashboard: React.FC<DashboardProps> = ({
 
   const handleRessarcir = () => {
     setRessarcindo(true);
-    setTimeout(() => {
-      setCancelado(true);
-    }, 3000);
   };
 
   const handleLiberar = () => {
@@ -144,17 +149,17 @@ export const Dashboard: React.FC<DashboardProps> = ({
                       </div>
                     )}
 
-                    {cancelado ? (
-                      <div className="w-full py-8 mt-4 rounded-2xl bg-brand-red/10 border border-brand-red/30 flex items-center justify-center">
-                        <span className="text-xl font-black text-brand-red uppercase tracking-[0.15em]">Inscrição cancelada</span>
-                      </div>
-                    ) : activeNotification.alerta ? (
+                    {activeNotification.alerta ? (
                       <button
                         onClick={handleRessarcir}
                         disabled={ressarcindo}
-                        className={`w-full py-5 mt-4 rounded-2xl bg-yellow-500 text-white font-black uppercase tracking-[0.2em] text-lg transition-all active:scale-95 shadow-lg shadow-yellow-500/20 ${ressarcindo ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        className={`w-full py-5 mt-4 rounded-2xl bg-yellow-500 text-white font-black uppercase tracking-[0.2em] text-lg transition-all active:scale-95 shadow-lg shadow-yellow-500/20 flex items-center justify-center gap-2 ${ressarcindo ? 'opacity-50 cursor-not-allowed' : ''}`}
                       >
-                        {ressarcindo ? 'PROCESSANDO...' : 'RESSARCIR CONTRIBUIÇÃO'}
+                        {ressarcindo ? (
+                          <><Loader2 className="w-5 h-5 animate-spin" /> PROCESSANDO...</>
+                        ) : (
+                          'RESSARCIR CONTRIBUIÇÃO'
+                        )}
                       </button>
                     ) : (
                       <button 
@@ -187,6 +192,25 @@ export const Dashboard: React.FC<DashboardProps> = ({
                       className="text-3xl font-black text-white uppercase tracking-[0.15em] text-center px-4"
                     >
                       RECOMPENSA ENVIADA
+                    </motion.span>
+                  </motion.div>
+                )}
+
+                {ressarcido && (
+                  <motion.div
+                    initial={{ scale: 0.8, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    exit={{ scale: 0.8, opacity: 0 }}
+                    transition={{ type: 'spring', duration: 0.5 }}
+                    className="absolute inset-0 z-20 flex items-center justify-center rounded-[32px] bg-black/70 backdrop-blur-sm"
+                  >
+                    <motion.span
+                      initial={{ y: 20, opacity: 0 }}
+                      animate={{ y: 0, opacity: 1 }}
+                      transition={{ delay: 0.2, duration: 0.4 }}
+                      className="text-3xl font-black text-white uppercase tracking-[0.15em] text-center px-4"
+                    >
+                      CONTRIBUIÇÃO RESSARCIDA
                     </motion.span>
                   </motion.div>
                 )}
