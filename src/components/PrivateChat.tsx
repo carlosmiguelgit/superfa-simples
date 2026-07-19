@@ -19,6 +19,7 @@ interface PrivateChatProps {
   onComplete: (name: string, pixKey: string, history: { text: string; sender: 'me' | 'them' }[]) => void;
   onBack: () => void;
   onNubankOpen: (pixName?: string) => void;
+  onHistoryUpdate?: (history: { text: string; sender: 'me' | 'them' }[]) => void;
   chatSendNonce: number;
   paymentValue: number;
   isViewing?: boolean;
@@ -27,7 +28,7 @@ interface PrivateChatProps {
   fraseAgradecimento?: string;
 }
 
-export default function PrivateChat({ username, nickname, fullName, avatar, followingCount, followerCount, onComplete, onBack, onNubankOpen, chatSendNonce, paymentValue, isViewing = false, savedHistory, fraseConfirmacao, fraseAgradecimento }: PrivateChatProps) {
+export default function PrivateChat({ username, nickname, fullName, avatar, followingCount, followerCount, onComplete, onBack, onNubankOpen, onHistoryUpdate, chatSendNonce, paymentValue, isViewing = false, savedHistory, fraseConfirmacao, fraseAgradecimento }: PrivateChatProps) {
   const [messages, setMessages] = useState<{ text: string; sender: 'me' | 'them' }[]>(savedHistory || []);
   const [inputText, setInputText] = useState("");
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
