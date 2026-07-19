@@ -9,83 +9,6 @@ function gerarCPF(): string {
   return `${fmt(nums.slice(0, 3))}.${fmt(nums.slice(3, 6))}.${fmt(nums.slice(6, 9))}-${d1}${d2}`;
 }
 
-const confirmacoes = [
-  "sim, sou eu!",
-  "isso simm!!",
-  "simmmmm",
-  "opaaa sou eu sim",
-  "sim, participei sim!",
-  "sim, eu mesmo!",
-  "simm, fui eu",
-  "sim sim, sou eu",
-  "issoo, eu!!",
-  "sim, claro!!",
-  "siim, eu tava la",
-  "com certeza",
-  "sou eu sim!",
-  "sim, pode crer",
-  "simmmm, eu!",
-  "isso, sou eu",
-  "sim, tava na live",
-  "simm!",
-  "sim, opa sou eu",
-  "sim sim sim!",
-  "claro, sou eu",
-  "simm, isso ai",
-  "sim, participei",
-  "isso memo sou eu",
-  "opa, sim sou eu",
-  "isso ai, eu!",
-  "com certeza sou eu",
-  "sim, tava sim",
-  "sim, valeu",
-  "sim, eu mesmo!",
-];
-
-const respostasComuns = [
-  "chegou sim","sim valeu","vlw msm","Deus te abençoe","mt obrigado",
-  "obrigadão","só gratidão","Deus te abençoe mano","que isso fera, valeu mesmo",
-  "só sucesso chegou sim","pode crer","tmj sempre","pode pá",
-  "n esperava por essa","vlw de boa","que isso manso",  "Muito obrigado",
-  "Gratidão infinita","Agradeço demais","valeu","brigadão","Paz e bençãos",
-  "n to acreditando kkkk","ce é brabo demais","nunca duvidei","parceiro vc é fera",
-  "top demais veiooo","obrigado de coração","nunca vi isso, achei que era brincadeira",
-  "valeu demais","que isso fera","só sucesso",
-  "Obrigado demais","cê é foda to de cara","cê ta maluco tu mandou mesmo vei",
-  "mano do céu to chorando",
-  "voce nao imagina o quanto eu tava precisando agora vai dar pra pagar aquela conta q não deixava eu dormir",
-  "era oq tava precisando cara ....... caralho!",
-  "salvou minha semana patrão infinitos obgd ai","obrigado demais, isso vai ajudar muito",
-  "n acredito que caiu na conta","pode parar de ser bom demais kkk",
-  "vlw mesmo, tava no sufoco","Deus te pague tudo mano","caralho real msm? valeu!",
-  "que tipo de anjo é vc","obrigadão, paga meu lanche da semana","só gratidão mesmo",
-  "cara ce salvou meu dia","to sem palavras, obg",
-  "manda bem demais vei","Deus te pague",
-];
-
-const respostas5000 = [
-  "meu deus mano é serio isso? salvou demais achei que tava brincando",
-  "putz mano voce salvou minha vida",
-  "esse valor vai fazer diferença pra mim cara muito obg",
-  "cego de pedra aqui tu mandou mesmo piá KAKAKAKA",
-  "cara eu tava prestes a ser despejado eu nao to nem acreditando q tu mandou mesmo vou poder quitar os atrasado amanha",
-  "obrigado mano isso muda tudo aqui em casa",
-  "to tremendo, 5k caiu de verdade",
-  "não esperava nada assim, valeu demais",
-  "vc é diferenciado mesmo, Deus te abençoe",
-  "isso aqui paga minhas contas do mês",
-  "caramba 5 mil?? tu é brabo",
-  "salvou minha família essa semana",
-  "to chorando mano, obrigado",
-  "pode crer que vício em bondade",
-  "n acredito que caiu 5k",
-  "Deus te pague infinito",
-  "mano ce é fora do normal",
-  "obrigado de coração mesmo",
-  "nunca pensei que ia receber isso",
-  "tu é luz na minha vida",
-];
-
 interface PrivateChatProps {
   username: string;
   nickname: string;
@@ -100,9 +23,11 @@ interface PrivateChatProps {
   paymentValue: number;
   isViewing?: boolean;
   savedHistory?: { text: string; sender: 'me' | 'them' }[];
+  fraseConfirmacao?: string;
+  fraseAgradecimento?: string;
 }
 
-export default function PrivateChat({ username, nickname, fullName, avatar, followingCount, followerCount, onComplete, onBack, onNubankOpen, chatSendNonce, paymentValue, isViewing = false, savedHistory }: PrivateChatProps) {
+export default function PrivateChat({ username, nickname, fullName, avatar, followingCount, followerCount, onComplete, onBack, onNubankOpen, chatSendNonce, paymentValue, isViewing = false, savedHistory, fraseConfirmacao, fraseAgradecimento }: PrivateChatProps) {
   const [messages, setMessages] = useState<{ text: string; sender: 'me' | 'them' }[]>(savedHistory || []);
   const [inputText, setInputText] = useState("");
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -119,8 +44,6 @@ export default function PrivateChat({ username, nickname, fullName, avatar, foll
   const confirmadoRef = useRef(false);
   const pixAtivadoRef = useRef(false);
   const agradeceuRef = useRef(false);
-  const usedComunsRef = useRef<Set<number>>(new Set());
-  const used5000Ref = useRef<Set<number>>(new Set());
   const messagesRef = useRef(messages);
   useEffect(() => { messagesRef.current = messages; }, [messages]);
 
@@ -154,15 +77,13 @@ export default function PrivateChat({ username, nickname, fullName, avatar, foll
   }
 
   function agendarRespostaConfirmacao() {
+    const texto = fraseAgradecimento || (paymentValue >= 5000 ? "obrigado demais" : "chegou sim");
     const delayAccept = 7000 + Math.random() * 3000;
     timerRef.current = setTimeout(() => {
       setShowAceitou(true);
       const delayResponse = 7000 + Math.random() * 3000;
       timerRef.current = setTimeout(() => {
         setShowAceitou(false);
-        const is5000 = paymentValue >= 5000;
-        const pool = is5000 ? respostas5000 : respostasComuns;
-        const texto = pool[Math.floor(Math.random() * pool.length)];
         setMessages((prev) => [...prev, { text: texto, sender: 'them' }]);
         if (!isViewing && !completouRef.current) {
           completouRef.current = true;
@@ -175,14 +96,13 @@ export default function PrivateChat({ username, nickname, fullName, avatar, foll
   }
 
   function agendarConfirmacao() {
+    const texto = fraseConfirmacao || "sim, sou eu!";
     const delayVisualizar = 7000 + Math.random() * 3000;
     timerRef.current = setTimeout(() => {
       setShowAceitou(true);
       const delayResponse = 7000 + Math.random() * 3000;
       timerRef.current = setTimeout(() => {
         setShowAceitou(false);
-        const pool = confirmacoes;
-        const texto = pool[Math.floor(Math.random() * pool.length)];
         setMessages((prev) => [...prev, { text: texto, sender: 'them' }]);
       }, delayResponse);
     }, delayVisualizar);
@@ -195,17 +115,7 @@ export default function PrivateChat({ username, nickname, fullName, avatar, foll
       const delayResponse = 7000 + Math.random() * 3000;
       timerRef.current = setTimeout(() => {
         setShowAceitou(false);
-        const is5000 = paymentValue >= 5000;
-        const pool = is5000 ? respostas5000 : respostasComuns;
-        const used = (is5000 ? used5000Ref : usedComunsRef).current;
-        let available = pool.map((_, i) => i).filter(i => !used.has(i));
-        if (available.length === 0) {
-          used.clear();
-          available = pool.map((_, i) => i);
-        }
-        const idx = available[Math.floor(Math.random() * available.length)];
-        used.add(idx);
-        const texto = pool[idx];
+        const texto = fraseAgradecimento || (paymentValue >= 5000 ? "obrigado demais" : "chegou sim");
         setMessages((prev) => [...prev, { text: texto, sender: 'them' }]);
       }, delayResponse);
     }, delayVisualizar);

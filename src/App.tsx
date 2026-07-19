@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { StatusBar } from './components/StatusBar';
 import { Header } from './components/Header';
 import { Dashboard } from './components/Dashboard';
@@ -9,6 +9,7 @@ import { PasswordLock } from './components/PasswordLock';
 import PrivateChat from './components/PrivateChat';
 import { Notification } from './types';
 import { useNotificationSystem } from './hooks/useNotificationSystem';
+import { CONFIRMACOES, RESPOSTAS_COMUNS, RESPOSTAS_5000 } from './constants';
 
 const MONTHS_TO_DECREASE_RANK = 10;
 
@@ -25,6 +26,11 @@ export default function App() {
   const [chatSendNonce, setChatSendNonce] = useState(0);
   const [chatPaymentValue, setChatPaymentValue] = useState(500);
   const [chatHistories, setChatHistories] = useState<Record<string, { text: string; sender: 'me' | 'them' }[]>>({});
+  const confirmacaoIndexRef = useRef(0);
+  const agradecimentoComumIndexRef = useRef(0);
+  const agradecimento5000IndexRef = useRef(0);
+  const [fraseConfirmacao, setFraseConfirmacao] = useState('');
+  const [fraseAgradecimento, setFraseAgradecimento] = useState('');
   const {
     notifications,
     setNotifications,
@@ -81,6 +87,17 @@ export default function App() {
     if (temHistorico) {
       setIsViewingChat(true);
     } else {
+      const idxConf = confirmacaoIndexRef.current;
+      confirmacaoIndexRef.current = (idxConf + 1) % CONFIRMACOES.length;
+      setFraseConfirmacao(CONFIRMACOES[idxConf]);
+
+      const is5000 = notif.value >= 5000;
+      const pool = is5000 ? RESPOSTAS_5000 : RESPOSTAS_COMUNS;
+      const idxRef = is5000 ? agradecimento5000IndexRef : agradecimentoComumIndexRef;
+      const idxAgr = idxRef.current;
+      idxRef.current = (idxAgr + 1) % pool.length;
+      setFraseAgradecimento(pool[idxAgr]);
+
       const temDepoimento = dynamicTestimonials.some(t => t.name === notif.name);
       setIsViewingChat(!temDepoimento);
     }
@@ -225,6 +242,8 @@ export default function App() {
             paymentValue={chatPaymentValue}
             isViewing={isViewingChat}
             savedHistory={chatHistories[chatNotification.id]}
+            fraseConfirmacao={fraseConfirmacao}
+            fraseAgradecimento={fraseAgradecimento}
           />
         )}
       </div>
