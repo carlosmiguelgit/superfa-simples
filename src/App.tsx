@@ -68,7 +68,8 @@ export default function App() {
 
   const handleExtratoPersonClick = (notif: Notification) => {
     setChatNotification(notif);
-    setIsViewingChat(true);
+    const temDepoimento = dynamicTestimonials.some(t => t.name === notif.name);
+    setIsViewingChat(!temDepoimento);
   };
 
   const handleRessarcir = (notif: Notification) => {
