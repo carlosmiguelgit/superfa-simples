@@ -181,18 +181,6 @@ export default function PrivateChat({ username, nickname, fullName, avatar, foll
         ))}
       </div>
 
-      {messages.length === 0 && (
-        <div className="shrink-0 border-t border-zinc-300">
-          <div className="flex items-center gap-3 px-6 py-3">
-            <img src="/e.png" alt="" className="w-[58px] h-[58px] shrink-0" />
-            <div className="flex-1 min-w-0">
-              <span className="text-[14px] font-bold text-black block leading-tight mb-0.5">Enviar solicitação de mensagem para {nickname}</span>
-              <span className="text-[13px] text-zinc-500 block leading-snug">Você só pode enviar uma mensagem direta até que o usuário responda. As respostas e reações ao story não são ilimitadas.</span>
-            </div>
-          </div>
-        </div>
-      )}
-
       {showAceitou && (
         <div className="shrink-0">
           <p className="text-[13px] text-zinc-500 text-center font-medium py-2">{nickname} aceitou sua solicitação</p>
