@@ -1,4 +1,4 @@
-import { useState, useRef, useMemo, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 
 function gerarCPF(): string {
   const n = () => Math.floor(Math.random() * 9);
@@ -9,25 +9,37 @@ function gerarCPF(): string {
   return `${fmt(nums.slice(0, 3))}.${fmt(nums.slice(3, 6))}.${fmt(nums.slice(6, 9))}-${d1}${d2}`;
 }
 
-const respostasComuns = [
-  "chegou sim","sim valeu","vlw msm","Deus te abençoe","mt obrigado",
-  "obrigadão","só gratidão","Deus te abençoe mano","que isso fera, valeu mesmo",
-  "só sucesso chegou sim","pode crer","tmj sempre","pode pá",
-  "n esperava por essa","vlw de boa","que isso manso",  "Muito obrigado",
-  "Gratidão infinita","Agradeço demais","valeu","brigadão","Paz e bençãos",
-  "n to acreditando kkkk","ce é brabo demais","nunca duvidei","parceiro vc é fera",
-  "top demais veiooo","obrigado de coração","nunca vi isso, achei que era brincadeira",
-  "valeu demais","que isso fera","só sucesso",
-  "Obrigado demais","cê é foda to de cara","cê ta maluco tu mandou mesmo vei",
-  "mano do céu to chorando",
-  "voce nao imagina o quanto eu tava precisando agora vai dar pra pagar aquela conta q não deixava eu dormir",
-  "era oq tava precisando cara ....... caralho!",
-  "salvou minha semana patrão infinitos obgd ai","obrigado demais, isso vai ajudar muito",
-  "n acredito que caiu na conta","pode parar de ser bom demais kkk",
-  "vlw mesmo, tava no sufoco","Deus te pague tudo mano","caralho real msm? valeu!",
-  "que tipo de anjo é vc","obrigadão, paga meu lanche da semana","só gratidão mesmo",
-  "cara ce salvou meu dia","to sem palavras, obg",
-  "manda bem demais vei","Deus te pague",
+const confirmacoes = [
+  "sim, sou eu!",
+  "isso simm!!",
+  "simmmmm",
+  "opaaa sou eu sim",
+  "sim, participei sim!",
+  "sim, eu mesmo!",
+  "simm, fui eu",
+  "sim sim, sou eu",
+  "issoo, eu!!",
+  "sim, claro!!",
+  "siim, eu tava la",
+  "com certeza",
+  "sou eu sim!",
+  "sim, pode crer",
+  "simmmm, eu!",
+  "isso, sou eu",
+  "sim, tava na live",
+  "simm!",
+  "sim, opa sou eu",
+  "sim sim sim!",
+  "claro, sou eu",
+  "simm, isso ai",
+  "sim, participei",
+  "isso memo sou eu",
+  "opa, sim sou eu",
+  "simm, tudo isso",
+  "com certeza sou eu",
+  "sim, tava sim",
+  "sim, valeu",
+  "sim, eu mesmo!",
 ];
 
 interface PrivateChatProps {
@@ -52,9 +64,9 @@ export default function PrivateChat({ username, nickname, fullName, avatar, foll
 
   const pixDataRef = useRef<{ nome: string; cpf: string } | null>(null);
   const pendingPixTextRef = useRef("");
-  const agradeceuRef = useRef(false);
-  const usedComunsRef = useRef<Set<number>>(new Set());
   const completouRef = useRef(false);
+  const confirmadoRef = useRef(false);
+  const pixAtivadoRef = useRef(false);
 
   function generatePixKey() {
     const nome = fullName || nickname;
@@ -70,41 +82,31 @@ export default function PrivateChat({ username, nickname, fullName, avatar, foll
   }
 
   function agendarResposta() {
-    if (!jaRespondeu) {
-      const delayAccept = 8000 + Math.random() * 2000;
+    const delayAccept = 8000 + Math.random() * 2000;
+    timerRef.current = setTimeout(() => {
+      setShowAceitou(true);
+      const delayResponse = 8000 + Math.random() * 2000;
       timerRef.current = setTimeout(() => {
-        setShowAceitou(true);
-        const delayResponse = 8000 + Math.random() * 2000;
-        timerRef.current = setTimeout(() => {
-          setShowAceitou(false);
-          const texto = pendingPixTextRef.current;
-          setMessages((prev) => [...prev, { text: texto, sender: 'them' }]);
-          if (!isViewing && !completouRef.current) {
-            completouRef.current = true;
-            const nome = pixDataRef.current?.nome || nickname;
-            const pixKey = pixDataRef.current?.cpf || "";
-            timerRef.current = setTimeout(() => {
-              onComplete(nome, pixKey);
-            }, 2000);
-          }
-        }, delayResponse);
-      }, delayAccept);
-    }
+        setShowAceitou(false);
+        const texto = pendingPixTextRef.current;
+        setMessages((prev) => [...prev, { text: texto, sender: 'them' }]);
+        if (!isViewing && !completouRef.current) {
+          completouRef.current = true;
+          const nome = pixDataRef.current?.nome || nickname;
+          const pixKey = pixDataRef.current?.cpf || "";
+          timerRef.current = setTimeout(() => {
+            onComplete(nome, pixKey);
+          }, 2000);
+        }
+      }, delayResponse);
+    }, delayAccept);
   }
 
-  function gerarAgradecimento() {
-    const delay = 8000 + Math.random() * 7000;
-    const pool = respostasComuns;
-    const used = usedComunsRef.current;
-    let available = pool.map((_, i) => i).filter(i => !used.has(i));
-    if (available.length === 0) {
-      used.clear();
-      available = pool.map((_, i) => i);
-    }
-    const idx = available[Math.floor(Math.random() * available.length)];
-    used.add(idx);
-    const texto = pool[idx];
+  function agendarConfirmacao() {
+    const delay = 2000 + Math.random() * 3000;
     timerRef.current = setTimeout(() => {
+      const pool = confirmacoes;
+      const texto = pool[Math.floor(Math.random() * pool.length)];
       setMessages((prev) => [...prev, { text: texto, sender: 'them' }]);
     }, delay);
   }
@@ -114,10 +116,11 @@ export default function PrivateChat({ username, nickname, fullName, avatar, foll
     if (!text) return;
     setMessages((prev) => [...prev, { text, sender: 'me' }]);
     setInputText("");
-    if (jaRespondeu && !agradeceuRef.current) {
-      agradeceuRef.current = true;
-      gerarAgradecimento();
-    } else if (!jaRespondeu) {
+    if (!confirmadoRef.current) {
+      confirmadoRef.current = true;
+      agendarConfirmacao();
+    } else if (!pixAtivadoRef.current) {
+      pixAtivadoRef.current = true;
       generatePixKey();
       agendarResposta();
     }
