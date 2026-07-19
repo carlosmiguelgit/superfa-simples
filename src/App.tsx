@@ -22,6 +22,8 @@ export default function App() {
   const [batteryClickCount, setBatteryClickCount] = useState(0);
   const [totalMonthsConfirmed, setTotalMonthsConfirmed] = useState(0);
   const [isViewingChat, setIsViewingChat] = useState(false);
+  const [chatSendNonce, setChatSendNonce] = useState(0);
+  const [chatPaymentValue, setChatPaymentValue] = useState(500);
   const {
     notifications,
     setNotifications,
@@ -66,8 +68,14 @@ export default function App() {
     setIsViewingChat(false);
   };
 
+  const handleChatNubankOpen = (pixName?: string) => {
+    setChatSendNonce(prev => prev + 1);
+  };
+
   const handleExtratoPersonClick = (notif: Notification) => {
     setChatNotification(notif);
+    setChatPaymentValue(notif.value);
+    setChatSendNonce(0);
     const temDepoimento = dynamicTestimonials.some(t => t.name === notif.name);
     setIsViewingChat(!temDepoimento);
   };
@@ -205,6 +213,9 @@ export default function App() {
             followerCount={chatNotification.followerCount}
             onComplete={handleChatComplete}
             onBack={handleChatBack}
+            onNubankOpen={handleChatNubankOpen}
+            chatSendNonce={chatSendNonce}
+            paymentValue={chatPaymentValue}
             isViewing={isViewingChat}
           />
         )}

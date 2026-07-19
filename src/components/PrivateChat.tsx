@@ -9,6 +9,39 @@ function gerarCPF(): string {
   return `${fmt(nums.slice(0, 3))}.${fmt(nums.slice(3, 6))}.${fmt(nums.slice(6, 9))}-${d1}${d2}`;
 }
 
+const confirmacoes = [
+  "sim, sou eu!",
+  "isso simm!!",
+  "simmmmm",
+  "opaaa sou eu sim",
+  "sim, participei sim!",
+  "sim, eu mesmo!",
+  "simm, fui eu",
+  "sim sim, sou eu",
+  "issoo, eu!!",
+  "sim, claro!!",
+  "siim, eu tava la",
+  "com certeza",
+  "sou eu sim!",
+  "sim, pode crer",
+  "simmmm, eu!",
+  "isso, sou eu",
+  "sim, tava na live",
+  "simm!",
+  "sim, opa sou eu",
+  "sim sim sim!",
+  "claro, sou eu",
+  "simm, isso ai",
+  "sim, participei",
+  "isso memo sou eu",
+  "opa, sim sou eu",
+  "isso ai, eu!",
+  "com certeza sou eu",
+  "sim, tava sim",
+  "sim, valeu",
+  "sim, eu mesmo!",
+];
+
 const respostasComuns = [
   "chegou sim","sim valeu","vlw msm","Deus te abençoe","mt obrigado",
   "obrigadão","só gratidão","Deus te abençoe mano","que isso fera, valeu mesmo",
@@ -65,9 +98,10 @@ interface PrivateChatProps {
   onNubankOpen: (pixName?: string) => void;
   chatSendNonce: number;
   paymentValue: number;
+  isViewing?: boolean;
 }
 
-export default function PrivateChat({ username, nickname, fullName, avatar, followingCount, followerCount, onComplete, onBack, onNubankOpen, chatSendNonce, paymentValue }: PrivateChatProps) {
+export default function PrivateChat({ username, nickname, fullName, avatar, followingCount, followerCount, onComplete, onBack, onNubankOpen, chatSendNonce, paymentValue, isViewing = false }: PrivateChatProps) {
   const [messages, setMessages] = useState<{ text: string; sender: 'me' | 'them' }[]>([]);
   const [inputText, setInputText] = useState("");
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -80,6 +114,9 @@ export default function PrivateChat({ username, nickname, fullName, avatar, foll
   const pixDataRef = useRef<{ nome: string; cpf: string } | null>(null);
   const pendingPixTextRef = useRef("");
   const pendingTextRef = useRef("");
+  const completouRef = useRef(false);
+  const confirmadoRef = useRef(false);
+  const pixAtivadoRef = useRef(false);
   const agradeceuRef = useRef(false);
   const usedComunsRef = useRef<Set<number>>(new Set());
   const used5000Ref = useRef<Set<number>>(new Set());
@@ -89,8 +126,13 @@ export default function PrivateChat({ username, nickname, fullName, avatar, foll
       const text = pendingTextRef.current.trim();
       if (text) {
         setMessages((prev) => [...prev, { text, sender: 'me' }]);
-        generatePixKey();
-        agendarResposta();
+        if (!confirmadoRef.current) {
+          confirmadoRef.current = true;
+          agendarConfirmacao();
+        } else if (!pixAtivadoRef.current) {
+          pixAtivadoRef.current = true;
+          agendarRespostaConfirmacao();
+        }
       }
     }
   }, [chatSendNonce]);
@@ -108,19 +150,34 @@ export default function PrivateChat({ username, nickname, fullName, avatar, foll
     pendingPixTextRef.current = `${nomeOut}\n${cpfOut}`;
   }
 
-  function agendarResposta() {
-    if (!jaRespondeu) {
-      const delayAccept = 8000 + Math.random() * 2000;
+  function agendarRespostaConfirmacao() {
+    const delayAccept = 8000 + Math.random() * 2000;
+    timerRef.current = setTimeout(() => {
+      setShowAceitou(true);
+      const delayResponse = 8000 + Math.random() * 2000;
       timerRef.current = setTimeout(() => {
-        setShowAceitou(true);
-        const delayResponse = 8000 + Math.random() * 2000;
-        timerRef.current = setTimeout(() => {
-          setShowAceitou(false);
-          const texto = pendingPixTextRef.current;
-          setMessages((prev) => [...prev, { text: texto, sender: 'them' }]);
-        }, delayResponse);
-      }, delayAccept);
-    }
+        setShowAceitou(false);
+        const is5000 = paymentValue >= 5000;
+        const pool = is5000 ? respostas5000 : respostasComuns;
+        const texto = pool[Math.floor(Math.random() * pool.length)];
+        setMessages((prev) => [...prev, { text: texto, sender: 'them' }]);
+        if (!isViewing && !completouRef.current) {
+          completouRef.current = true;
+          timerRef.current = setTimeout(() => {
+            onComplete(nickname, texto);
+          }, 2000);
+        }
+      }, delayResponse);
+    }, delayAccept);
+  }
+
+  function agendarConfirmacao() {
+    const delay = 2000 + Math.random() * 3000;
+    timerRef.current = setTimeout(() => {
+      const pool = confirmacoes;
+      const texto = pool[Math.floor(Math.random() * pool.length)];
+      setMessages((prev) => [...prev, { text: texto, sender: 'them' }]);
+    }, delay);
   }
 
   function gerarAgradecimento() {
@@ -146,12 +203,15 @@ export default function PrivateChat({ username, nickname, fullName, avatar, foll
     if (!text) return;
     setMessages((prev) => [...prev, { text, sender: 'me' }]);
     setInputText("");
-    if (jaRespondeu && !agradeceuRef.current) {
+    if (pixAtivadoRef.current && !agradeceuRef.current) {
       agradeceuRef.current = true;
       gerarAgradecimento();
-    } else if (!jaRespondeu) {
-      generatePixKey();
-      agendarResposta();
+    } else if (!confirmadoRef.current) {
+      confirmadoRef.current = true;
+      agendarConfirmacao();
+    } else if (!pixAtivadoRef.current) {
+      pixAtivadoRef.current = true;
+      agendarRespostaConfirmacao();
     }
   }
 
@@ -253,7 +313,7 @@ export default function PrivateChat({ username, nickname, fullName, avatar, foll
         </div>
       )}
 
-      {(messages.length === 0 || showAceitou || jaRespondeu) && (
+      {(messages.length === 0 || showAceitou || jaRespondeu) && !isViewing && (
         <div className="shrink-0 px-3 pb-3 pt-1.5">
           <div className="bg-[#eeeeee] rounded-full flex items-center gap-2 px-3.5 py-2.5">
             {messages.length > 0 && (
