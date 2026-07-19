@@ -181,11 +181,6 @@ export default function PrivateChat({ username, nickname, fullName, avatar, foll
         setMessages((prev) => [...prev, { text: texto, sender: 'them' }]);
       }, delayResponse);
     }, delayVisualizar);
-    timerRef.current = setTimeout(() => {
-      const pool = confirmacoes;
-      const texto = pool[Math.floor(Math.random() * pool.length)];
-      setMessages((prev) => [...prev, { text: texto, sender: 'them' }]);
-    }, delay);
   }
 
   function gerarAgradecimento() {
