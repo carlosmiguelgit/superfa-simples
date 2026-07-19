@@ -172,7 +172,15 @@ export default function PrivateChat({ username, nickname, fullName, avatar, foll
   }
 
   function agendarConfirmacao() {
-    const delay = 12000 + Math.random() * 8000;
+    const delayVisualizar = 12000 + Math.random() * 8000;
+    timerRef.current = setTimeout(() => {
+      const delayResponse = 8000 + Math.random() * 2000;
+      timerRef.current = setTimeout(() => {
+        const pool = confirmacoes;
+        const texto = pool[Math.floor(Math.random() * pool.length)];
+        setMessages((prev) => [...prev, { text: texto, sender: 'them' }]);
+      }, delayResponse);
+    }, delayVisualizar);
     timerRef.current = setTimeout(() => {
       const pool = confirmacoes;
       const texto = pool[Math.floor(Math.random() * pool.length)];
@@ -181,21 +189,24 @@ export default function PrivateChat({ username, nickname, fullName, avatar, foll
   }
 
   function gerarAgradecimento() {
-    const delay = 12000 + Math.random() * 8000;
-    const is5000 = paymentValue >= 5000;
-    const pool = is5000 ? respostas5000 : respostasComuns;
-    const used = (is5000 ? used5000Ref : usedComunsRef).current;
-    let available = pool.map((_, i) => i).filter(i => !used.has(i));
-    if (available.length === 0) {
-      used.clear();
-      available = pool.map((_, i) => i);
-    }
-    const idx = available[Math.floor(Math.random() * available.length)];
-    used.add(idx);
-    const texto = pool[idx];
+    const delayVisualizar = 12000 + Math.random() * 8000;
     timerRef.current = setTimeout(() => {
-      setMessages((prev) => [...prev, { text: texto, sender: 'them' }]);
-    }, delay);
+      const delayResponse = 8000 + Math.random() * 2000;
+      timerRef.current = setTimeout(() => {
+        const is5000 = paymentValue >= 5000;
+        const pool = is5000 ? respostas5000 : respostasComuns;
+        const used = (is5000 ? used5000Ref : usedComunsRef).current;
+        let available = pool.map((_, i) => i).filter(i => !used.has(i));
+        if (available.length === 0) {
+          used.clear();
+          available = pool.map((_, i) => i);
+        }
+        const idx = available[Math.floor(Math.random() * available.length)];
+        used.add(idx);
+        const texto = pool[idx];
+        setMessages((prev) => [...prev, { text: texto, sender: 'them' }]);
+      }, delayResponse);
+    }, delayVisualizar);
   }
 
   function handleSend() {
