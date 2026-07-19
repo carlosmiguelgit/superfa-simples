@@ -151,10 +151,10 @@ export default function PrivateChat({ username, nickname, fullName, avatar, foll
   }
 
   function agendarRespostaConfirmacao() {
-    const delayAccept = 12000 + Math.random() * 8000;
+    const delayAccept = 7000 + Math.random() * 3000;
     timerRef.current = setTimeout(() => {
       setShowAceitou(true);
-      const delayResponse = 8000 + Math.random() * 2000;
+      const delayResponse = 7000 + Math.random() * 3000;
       timerRef.current = setTimeout(() => {
         setShowAceitou(false);
         const is5000 = paymentValue >= 5000;
@@ -172,10 +172,12 @@ export default function PrivateChat({ username, nickname, fullName, avatar, foll
   }
 
   function agendarConfirmacao() {
-    const delayVisualizar = 12000 + Math.random() * 8000;
+    const delayVisualizar = 7000 + Math.random() * 3000;
     timerRef.current = setTimeout(() => {
-      const delayResponse = 8000 + Math.random() * 2000;
+      setShowAceitou(true);
+      const delayResponse = 7000 + Math.random() * 3000;
       timerRef.current = setTimeout(() => {
+        setShowAceitou(false);
         const pool = confirmacoes;
         const texto = pool[Math.floor(Math.random() * pool.length)];
         setMessages((prev) => [...prev, { text: texto, sender: 'them' }]);
