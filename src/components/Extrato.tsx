@@ -1,5 +1,5 @@
 import React from 'react';
-import { History, User, MessageSquare } from 'lucide-react';
+import { MessageSquareText, User, MessageSquare } from 'lucide-react';
 import { Notification, Testimonial } from '../types';
 
 interface ExtratoProps {
@@ -7,19 +7,21 @@ interface ExtratoProps {
   dynamicTestimonials: Testimonial[];
   isAnonymousMode: boolean;
   isDarkMode?: boolean;
+  onPersonClick: (notif: Notification) => void;
 }
 
 export const Extrato: React.FC<ExtratoProps> = ({ 
   confirmedNotifications, 
   dynamicTestimonials, 
   isAnonymousMode,
-  isDarkMode = true
+  isDarkMode = true,
+  onPersonClick
 }) => {
   return (
     <div className="mt-2">
       <div className="flex items-center justify-between mb-4 px-2">
-        <h4 className={`text-xs font-bold uppercase tracking-widest ${isDarkMode ? 'text-white/70' : 'text-slate-400'}`}>Extrato de Inscrições</h4>
-        <History className={`w-4 h-4 ${isDarkMode ? 'text-white/50' : 'text-slate-300'}`} />
+        <h4 className={`text-xs font-bold uppercase tracking-widest ${isDarkMode ? 'text-white/70' : 'text-slate-400'}`}>Depoimentos</h4>
+        <MessageSquareText className={`w-4 h-4 ${isDarkMode ? 'text-white/50' : 'text-slate-300'}`} />
       </div>
       
       <div className="space-y-3">
@@ -34,11 +36,12 @@ export const Extrato: React.FC<ExtratoProps> = ({
             return (
               <div 
                 key={notif.id} 
-                className={`glass rounded-2xl p-4 flex items-center justify-between transition-all ${
+                onClick={() => onPersonClick(notif)}
+                className={`glass rounded-2xl p-4 flex items-center justify-between transition-all cursor-pointer active:scale-[0.98] ${
                   hasTestimonial 
                     ? (isDarkMode ? 'border-brand-red/30 bg-white/[0.08]' : 'border-brand-red/30 bg-black/[0.02]') 
                     : (isDarkMode ? 'bg-white/[0.03] border-white/5' : 'bg-black/[0.02] border-black/5')
-                } ${hasTestimonial ? 'cursor-pointer active:scale-[0.98]' : ''}`}
+                }`}
               >
                 <div className="flex items-center gap-3">
                   <div className={`w-10 h-10 rounded-xl flex items-center justify-center overflow-hidden border ${isDarkMode ? 'bg-white/5 border-white/20' : 'bg-black/5 border-black/10'}`}>

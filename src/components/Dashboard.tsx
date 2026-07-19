@@ -10,8 +10,6 @@ import { Notification } from '../types';
 
 interface DashboardProps {
   notifications: Notification[];
-  activeNotification: Notification | null;
-  setActiveNotification: (notif: Notification | null) => void;
   isAnonymousMode: boolean;
   isDarkMode?: boolean;
   onStartChat: (notif: Notification) => void;
@@ -20,13 +18,12 @@ interface DashboardProps {
 
 export const Dashboard: React.FC<DashboardProps> = ({
   notifications,
-  activeNotification,
-  setActiveNotification,
   isAnonymousMode,
   isDarkMode = true,
   onStartChat,
   onRessarcir,
 }) => {
+  const [activeNotification, setActiveNotification] = useState<Notification | null>(null);
   const [ressarcindo, setRessarcindo] = useState(false);
   const [cancelado, setCancelado] = useState(false);
 

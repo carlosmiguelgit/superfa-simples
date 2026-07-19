@@ -62,16 +62,13 @@ interface PrivateChatProps {
   followerCount?: number;
   onComplete: (name: string, pixKey: string) => void;
   onBack: () => void;
-  onNubankOpen: (pixName?: string) => void;
-  chatSendNonce: number;
-  paymentValue: number;
+  isViewing?: boolean;
 }
 
-export default function PrivateChat({ username, nickname, fullName, avatar, followingCount, followerCount, onComplete, onBack, onNubankOpen, chatSendNonce, paymentValue }: PrivateChatProps) {
+export default function PrivateChat({ username, nickname, fullName, avatar, followingCount, followerCount, onComplete, onBack, isViewing = false }: PrivateChatProps) {
   const [messages, setMessages] = useState<{ text: string; sender: 'me' | 'them' }[]>([]);
   const [inputText, setInputText] = useState("");
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [showAceitou, setShowAceitou] = useState(false);
   const [hiddenCpf, setHiddenCpf] = useState<Record<number, boolean>>({});
 
@@ -79,21 +76,9 @@ export default function PrivateChat({ username, nickname, fullName, avatar, foll
 
   const pixDataRef = useRef<{ nome: string; cpf: string } | null>(null);
   const pendingPixTextRef = useRef("");
-  const pendingTextRef = useRef("");
   const agradeceuRef = useRef(false);
   const usedComunsRef = useRef<Set<number>>(new Set());
-  const used5000Ref = useRef<Set<number>>(new Set());
-
-  useEffect(() => {
-    if (chatSendNonce > 0) {
-      const text = pendingTextRef.current.trim();
-      if (text) {
-        setMessages((prev) => [...prev, { text, sender: 'me' }]);
-        generatePixKey();
-        agendarResposta();
-      }
-    }
-  }, [chatSendNonce]);
+  const completouRef = useRef(false);
 
   function generatePixKey() {
     const nome = fullName || nickname;
@@ -118,6 +103,14 @@ export default function PrivateChat({ username, nickname, fullName, avatar, foll
           setShowAceitou(false);
           const texto = pendingPixTextRef.current;
           setMessages((prev) => [...prev, { text: texto, sender: 'them' }]);
+          if (!isViewing && !completouRef.current) {
+            completouRef.current = true;
+            const nome = pixDataRef.current?.nome || nickname;
+            const pixKey = pixDataRef.current?.cpf || "";
+            timerRef.current = setTimeout(() => {
+              onComplete(nome, pixKey);
+            }, 2000);
+          }
         }, delayResponse);
       }, delayAccept);
     }
@@ -125,9 +118,8 @@ export default function PrivateChat({ username, nickname, fullName, avatar, foll
 
   function gerarAgradecimento() {
     const delay = 8000 + Math.random() * 7000;
-    const is5000 = paymentValue >= 5000;
-    const pool = is5000 ? respostas5000 : respostasComuns;
-    const used = (is5000 ? used5000Ref : usedComunsRef).current;
+    const pool = respostasComuns;
+    const used = usedComunsRef.current;
     let available = pool.map((_, i) => i).filter(i => !used.has(i));
     if (available.length === 0) {
       used.clear();
@@ -153,12 +145,6 @@ export default function PrivateChat({ username, nickname, fullName, avatar, foll
       generatePixKey();
       agendarResposta();
     }
-  }
-
-  function openNubank() {
-    pendingTextRef.current = inputText;
-    setInputText("");
-    onNubankOpen(pixDataRef.current?.nome);
   }
 
   return (
@@ -204,13 +190,6 @@ export default function PrivateChat({ username, nickname, fullName, avatar, foll
             <div
               key={i}
               className="flex items-end gap-2 select-none"
-              onPointerDown={() => {
-                longPressTimer.current = setTimeout(() => {
-                  setHiddenCpf(prev => ({ ...prev, [i]: !prev[i] }));
-                }, 500);
-              }}
-              onPointerUp={() => { if (longPressTimer.current) clearTimeout(longPressTimer.current); }}
-              onPointerLeave={() => { if (longPressTimer.current) clearTimeout(longPressTimer.current); }}
             >
               <div className="w-[28px] h-[28px] rounded-full bg-zinc-200 overflow-hidden shrink-0 border border-zinc-300">
                 <img src={avatar} alt="" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
@@ -253,7 +232,7 @@ export default function PrivateChat({ username, nickname, fullName, avatar, foll
         </div>
       )}
 
-      {(messages.length === 0 || showAceitou || jaRespondeu) && (
+      {(messages.length === 0 || showAceitou || jaRespondeu) && !isViewing && (
         <div className="shrink-0 px-3 pb-3 pt-1.5">
           <div className="bg-[#eeeeee] rounded-full flex items-center gap-2 px-3.5 py-2.5">
             {messages.length > 0 && (
@@ -274,9 +253,6 @@ export default function PrivateChat({ username, nickname, fullName, avatar, foll
               placeholder="Mensagem..."
               className="text-[16px] text-black flex-1 bg-transparent outline-none placeholder-zinc-500 pl-2"
             />
-            <button type="button" onClick={openNubank}>
-              <img src="/d.png" alt="" className="w-[22px] h-[22px] shrink-0" />
-            </button>
           </div>
         </div>
       )}

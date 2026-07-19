@@ -28,4 +28,3 @@ export interface Testimonial {
   timestamp?: Date;
 }
 
-export type PaymentMethod = 'nubank' | 'classic';

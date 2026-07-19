@@ -3,10 +3,8 @@ import { StatusBar } from './components/StatusBar';
 import { Header } from './components/Header';
 import { Dashboard } from './components/Dashboard';
 import { Extrato } from './components/Extrato';
-
 import { Ranking } from './components/Ranking';
 import { BottomNav } from './components/BottomNav';
-import { NubankSheet } from './components/NubankSheet';
 import { PasswordLock } from './components/PasswordLock';
 import PrivateChat from './components/PrivateChat';
 import { Notification } from './types';
@@ -16,27 +14,18 @@ const MONTHS_TO_DECREASE_RANK = 10;
 
 export default function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [activeTab, setActiveTab] = useState<'dash' | 'extrato' | 'ranking'>('dash');
+  const [activeTab, setActiveTab] = useState<'dash' | 'depoimentos' | 'ranking'>('dash');
   const [confirmedNotifications, setConfirmedNotifications] = useState<Notification[]>([]);
-  const [balance, setBalance] = useState(84600.00);
-  const [nubankBalance, setNubankBalance] = useState(348742.18);
-  const [activeNotification, setActiveNotification] = useState<Notification | null>(null);
-  const [isNubankSheetOpen, setIsNubankSheetOpen] = useState(false);
   const [isAnonymousMode, setIsAnonymousMode] = useState(false);
   const [chatNotification, setChatNotification] = useState<Notification | null>(null);
-  const [chatSendNonce, setChatSendNonce] = useState(0);
-  const [isChatPayment, setIsChatPayment] = useState(false);
-  const [chatPaymentValue, setChatPaymentValue] = useState(500);
-  
   const [isDarkMode, setIsDarkMode] = useState(false);
-
   const [batteryClickCount, setBatteryClickCount] = useState(0);
   const [totalMonthsConfirmed, setTotalMonthsConfirmed] = useState(0);
+  const [isViewingChat, setIsViewingChat] = useState(false);
   const {
     notifications,
     setNotifications,
     dynamicTestimonials,
-
     setPendingTestimonials,
     addToBlacklist
   } = useNotificationSystem();
@@ -60,70 +49,6 @@ export default function App() {
     setIsDarkMode(prev => !prev);
   };
 
-  const handleStartPayment = (notif: Notification) => {
-    setActiveNotification(notif);
-    setIsNubankSheetOpen(true);
-  };
-
-  const processPayment = (method: 'conta' | 'credito', editedValue?: number, notifToProcess?: Notification) => {
-    const targetNotif = notifToProcess || activeNotification;
-    if (!targetNotif) return;
-
-    const finalValue = editedValue ?? targetNotif.value;
-    
-    setConfirmedNotifications(prev => [{ ...targetNotif, value: finalValue }, ...prev]);
-    setNubankBalance(prev => prev - finalValue);
-    setBalance(prev => prev - finalValue);
-    setNotifications(prev => prev.filter(n => n.id !== targetNotif.id));
-    setTotalMonthsConfirmed(prev => prev + targetNotif.months);
-
-    addToBlacklist(targetNotif.name);
-
-    if (Math.random() < 0.85) {
-      const delaySeconds = Math.floor(Math.random() * 180) + 300;
-      const visibleAt = Date.now() + (delaySeconds * 1000);
-      setPendingTestimonials(prev => [...prev, {
-        id: `dyn-${targetNotif.id}`,
-        name: targetNotif.name,
-        text: "só gratidão guilherme, de verdade",
-        rating: 5,
-        gender: targetNotif.gender,
-        photo: "", 
-        months: targetNotif.months,
-        timestamp: new Date(Date.now() - 3600000),
-        visibleAt
-      }]);
-    }
-  };
-
-  const handleChatNubankOpen = (pixName?: string) => {
-    if (pixName && chatNotification) {
-      setActiveNotification({ ...chatNotification, name: pixName });
-    } else {
-      setActiveNotification(chatNotification);
-    }
-    setIsChatPayment(true);
-    setIsNubankSheetOpen(true);
-  };
-
-  const handleConfirmNubank = (method: 'conta' | 'credito', editedValue: number) => {
-    if (isChatPayment) {
-      processPayment(method, editedValue, chatNotification || undefined);
-      setChatPaymentValue(editedValue);
-      setChatSendNonce(prev => prev + 1);
-      setIsChatPayment(false);
-    } else {
-      processPayment(method, editedValue);
-    }
-    setActiveNotification(null);
-  };
-
-  const handleCloseNubank = () => {
-    setIsNubankSheetOpen(false);
-    setActiveNotification(null);
-    setIsChatPayment(false);
-  };
-
   const handleBatteryClick = () => {
     setBatteryClickCount(prev => {
       const next = prev + 1;
@@ -138,15 +63,27 @@ export default function App() {
 
   const handleStartChat = (notif: Notification) => {
     setChatNotification(notif);
+    setIsViewingChat(false);
+  };
+
+  const handleExtratoPersonClick = (notif: Notification) => {
+    setChatNotification(notif);
+    setIsViewingChat(true);
   };
 
   const handleRessarcir = (notif: Notification) => {
     setNotifications(prev => prev.filter(n => n.id !== notif.id));
-    setActiveNotification(null);
   };
 
   const handleChatComplete = (name: string, pixKey: string) => {
     if (!chatNotification) return;
+
+    if (isViewingChat) {
+      setChatNotification(null);
+      setIsViewingChat(false);
+      return;
+    }
+
     const notif = { ...chatNotification, name, pixKey };
     setConfirmedNotifications(prev => [notif, ...prev]);
     setNotifications(prev => prev.filter(n => n.id !== chatNotification.id));
@@ -172,6 +109,7 @@ export default function App() {
 
   const handleChatBack = () => {
     setChatNotification(null);
+    setIsViewingChat(false);
   };
 
   if (!isAuthenticated) {
@@ -199,20 +137,19 @@ export default function App() {
           {activeTab === 'dash' && (
             <Dashboard
               notifications={notifications}
-              activeNotification={activeNotification}
-              setActiveNotification={setActiveNotification}
               isAnonymousMode={isAnonymousMode}
               isDarkMode={isDarkMode}
               onStartChat={handleStartChat}
               onRessarcir={handleRessarcir}
             />
           )}
-          {activeTab === 'extrato' && (
+          {activeTab === 'depoimentos' && (
             <Extrato 
               confirmedNotifications={confirmedNotifications} 
               dynamicTestimonials={dynamicTestimonials}
               isAnonymousMode={isAnonymousMode} 
               isDarkMode={isDarkMode}
+              onPersonClick={handleExtratoPersonClick}
             />
           )}
           {activeTab === 'ranking' && (
@@ -224,25 +161,13 @@ export default function App() {
           )}
         </main>
         
-        <NubankSheet 
-          isOpen={isNubankSheetOpen}
-          onClose={handleCloseNubank}
-          notification={activeNotification}
-          nubankBalance={nubankBalance}
-          onConfirm={handleConfirmNubank}
-          isAnonymousMode={isAnonymousMode}
-          isDarkMode={isDarkMode}
-        />
-
-        {!isNubankSheetOpen && (
-          <div className="shrink-0">
-            <BottomNav 
-              activeTab={activeTab} 
-              setActiveTab={setActiveTab} 
-              isDarkMode={isDarkMode} 
-            />
-          </div>
-        )}
+        <div className="shrink-0">
+          <BottomNav 
+            activeTab={activeTab} 
+            setActiveTab={setActiveTab} 
+            isDarkMode={isDarkMode} 
+          />
+        </div>
         
         <div className={`absolute bottom-2 left-1/2 -translate-x-1/2 w-32 h-1.5 rounded-full z-20 transition-colors duration-500 ${isDarkMode ? 'bg-white/10' : 'bg-black/10'}`} />
 
@@ -256,9 +181,7 @@ export default function App() {
             followerCount={chatNotification.followerCount}
             onComplete={handleChatComplete}
             onBack={handleChatBack}
-            onNubankOpen={handleChatNubankOpen}
-            chatSendNonce={chatSendNonce}
-            paymentValue={chatPaymentValue}
+            isViewing={isViewingChat}
           />
         )}
       </div>

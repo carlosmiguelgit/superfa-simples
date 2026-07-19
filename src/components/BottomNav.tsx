@@ -1,9 +1,9 @@
 import React from 'react';
-import { LayoutDashboard, History, Trophy } from 'lucide-react';
+import { LayoutDashboard, MessageSquareText, Trophy } from 'lucide-react';
 
 interface BottomNavProps {
-  activeTab: 'dash' | 'extrato' | 'ranking';
-  setActiveTab: (tab: 'dash' | 'extrato' | 'ranking') => void;
+  activeTab: 'dash' | 'depoimentos' | 'ranking';
+  setActiveTab: (tab: 'dash' | 'depoimentos' | 'ranking') => void;
   isDarkMode?: boolean;
 }
 
@@ -18,11 +18,11 @@ export const BottomNav: React.FC<BottomNavProps> = ({ activeTab, setActiveTab, i
         <span className="text-[9px] font-bold uppercase tracking-widest">Dash</span>
       </button>
       <button 
-        onClick={() => setActiveTab('extrato')}
-        className={`flex flex-col items-center justify-center gap-1 transition-all duration-300 ${activeTab === 'extrato' ? 'text-brand-red' : (isDarkMode ? 'text-white/40 hover:text-white/70' : 'text-slate-300 hover:text-slate-500')}`}
+        onClick={() => setActiveTab('depoimentos')}
+        className={`flex flex-col items-center justify-center gap-1 transition-all duration-300 ${activeTab === 'depoimentos' ? 'text-brand-red' : (isDarkMode ? 'text-white/40 hover:text-white/70' : 'text-slate-300 hover:text-slate-500')}`}
       >
-        <History className={`w-5 h-5 transition-transform ${activeTab === 'extrato' ? 'scale-110' : ''}`} />
-        <span className="text-[9px] font-bold uppercase tracking-widest">Extrato</span>
+        <MessageSquareText className={`w-5 h-5 transition-transform ${activeTab === 'depoimentos' ? 'scale-110' : ''}`} />
+        <span className="text-[9px] font-bold uppercase tracking-widest">Depoimentos</span>
       </button>
       <button 
         onClick={() => setActiveTab('ranking')}
