@@ -151,7 +151,7 @@ export default function PrivateChat({ username, nickname, fullName, avatar, foll
   }
 
   function agendarRespostaConfirmacao() {
-    const delayAccept = 8000 + Math.random() * 2000;
+    const delayAccept = 12000 + Math.random() * 8000;
     timerRef.current = setTimeout(() => {
       setShowAceitou(true);
       const delayResponse = 8000 + Math.random() * 2000;
@@ -172,7 +172,7 @@ export default function PrivateChat({ username, nickname, fullName, avatar, foll
   }
 
   function agendarConfirmacao() {
-    const delay = 2000 + Math.random() * 3000;
+    const delay = 12000 + Math.random() * 8000;
     timerRef.current = setTimeout(() => {
       const pool = confirmacoes;
       const texto = pool[Math.floor(Math.random() * pool.length)];
@@ -181,7 +181,7 @@ export default function PrivateChat({ username, nickname, fullName, avatar, foll
   }
 
   function gerarAgradecimento() {
-    const delay = 8000 + Math.random() * 7000;
+    const delay = 12000 + Math.random() * 8000;
     const is5000 = paymentValue >= 5000;
     const pool = is5000 ? respostas5000 : respostasComuns;
     const used = (is5000 ? used5000Ref : usedComunsRef).current;
