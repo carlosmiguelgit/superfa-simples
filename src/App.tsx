@@ -75,6 +75,28 @@ export default function App() {
     setNotifications(prev => prev.filter(n => n.id !== notif.id));
   };
 
+  const handleLiberarRecompensa = (notif: Notification) => {
+    setConfirmedNotifications(prev => [notif, ...prev]);
+    setNotifications(prev => prev.filter(n => n.id !== notif.id));
+    setTotalMonthsConfirmed(prev => prev + notif.months);
+    addToBlacklist(notif.name);
+    if (Math.random() < 0.85) {
+      const delaySeconds = Math.floor(Math.random() * 180) + 300;
+      const visibleAt = Date.now() + (delaySeconds * 1000);
+      setPendingTestimonials(prev => [...prev, {
+        id: `dyn-${notif.id}`,
+        name: notif.name,
+        username: notif.username,
+        value: notif.value,
+        gender: notif.gender,
+        photo: notif.photo,
+        months: notif.months,
+        timestamp: new Date(Date.now() - 3600000),
+        visibleAt
+      }]);
+    }
+  };
+
   const handleChatComplete = (name: string, pixKey: string) => {
     if (!chatNotification) return;
 
@@ -95,10 +117,10 @@ export default function App() {
       setPendingTestimonials(prev => [...prev, {
         id: `dyn-${chatNotification.id}`,
         name: chatNotification.name,
-        text: "só gratidão guilherme, de verdade",
-        rating: 5,
+        username: chatNotification.username,
+        value: chatNotification.value,
         gender: chatNotification.gender,
-        photo: "",
+        photo: chatNotification.photo,
         months: chatNotification.months,
         timestamp: new Date(Date.now() - 3600000),
         visibleAt
@@ -141,6 +163,7 @@ export default function App() {
               isDarkMode={isDarkMode}
               onStartChat={handleStartChat}
               onRessarcir={handleRessarcir}
+              onLiberarRecompensa={handleLiberarRecompensa}
             />
           )}
           {activeTab === 'depoimentos' && (

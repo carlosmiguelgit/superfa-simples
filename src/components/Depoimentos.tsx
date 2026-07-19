@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { MessageSquare, User, CheckCircle2 } from 'lucide-react';
+import { MessageSquare, User } from 'lucide-react';
 import { Testimonial } from '../types';
 
 interface DepoimentosProps {
@@ -25,16 +25,6 @@ export const Depoimentos: React.FC<DepoimentosProps> = ({
     }
   }, [highlightName]);
 
-  const getRelativeTime = (date?: Date) => {
-    if (!date) return 'agora';
-    const diff = Math.floor((new Date().getTime() - date.getTime()) / 1000 / 60);
-    if (diff < 1) return 'agora';
-    if (diff < 60) return `há ${diff} min`;
-    const hours = Math.floor(diff / 60);
-    if (hours < 24) return `há ${hours}h`;
-    return date.toLocaleDateString();
-  };
-
   return (
     <div className="mt-2" ref={containerRef}>
       <div className="flex items-center justify-between mb-4 px-2">
@@ -42,50 +32,45 @@ export const Depoimentos: React.FC<DepoimentosProps> = ({
         <MessageSquare className={`w-4 h-4 ${isDarkMode ? 'text-white/50' : 'text-slate-300'}`} />
       </div>
       
-      <div className="grid grid-cols-1 gap-2.5">
+      <div className="space-y-3">
         {allTestimonials.map((t, idx) => (
           <div 
             key={`${t.id}-${idx}`} 
             id={`testimonial-${t.name}`}
-            className={`border rounded-xl p-4 flex flex-col gap-2 transition-all duration-500 ${
+            className={`glass rounded-2xl p-4 flex items-center justify-between transition-all ${
               isDarkMode 
-                ? 'bg-white/[0.04] border-white/10' 
+                ? 'bg-white/[0.04] border-white/5' 
                 : 'bg-black/[0.02] border-black/5'
-            } ${highlightName === t.name ? 'border-brand-red bg-brand-red/10 scale-[1.02]' : 'hover:border-brand-red/30'}`}
+            } ${highlightName === t.name ? 'border-brand-red bg-brand-red/10 scale-[1.02]' : ''}`}
           >
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center overflow-hidden border ${isDarkMode ? 'bg-white/10 border-white/20' : 'bg-black/5 border-black/10'}`}>
-                  {t.photo ? (
-                    <img src={t.photo} alt={t.name} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
-                  ) : (
-                    <User className={`w-4 h-4 ${isDarkMode ? 'text-white/70' : 'text-slate-400'}`} />
-                  )}
-                </div>
-                <div className="flex flex-col">
-                  <div className="flex items-center gap-1">
-                    <p className="text-[13px] font-bold text-brand-red">{t.name}</p>
-                    <CheckCircle2 className="w-3 h-3 text-brand-red" />
-                  </div>
-                  {t.username && (
-                    <span className={`text-[9px] ${isDarkMode ? 'text-white/40' : 'text-slate-400'}`}>
-                      @{t.username}
-                    </span>
-                  )}
-                  {t.months && (
-                    <span className={`text-[9px] font-black uppercase tracking-wider ${isDarkMode ? 'text-white/40' : 'text-slate-400'}`}>
-                      {t.months} {t.months === 1 ? 'MÊS' : 'MESES'} • SUPER-FÃ
-                    </span>
-                  )}
-                </div>
+            <div className="flex items-center gap-3">
+              <div className={`w-10 h-10 rounded-xl flex items-center justify-center overflow-hidden border ${isDarkMode ? 'bg-white/5 border-white/20' : 'bg-black/5 border-black/10'}`}>
+                {t.photo ? (
+                  <img src={t.photo} alt={t.name} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                ) : (
+                  <User className={`w-5 h-5 ${isDarkMode ? 'text-white/70' : 'text-slate-400'}`} />
+                )}
               </div>
-              <span className={`text-[10px] font-medium uppercase tracking-tighter ${isDarkMode ? 'text-white/60' : 'text-slate-400'}`}>
-                {getRelativeTime(t.timestamp)}
-              </span>
+              <div>
+                <p className={`text-sm font-bold ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>
+                  {t.name}
+                </p>
+                {t.username && (
+                  <p className={`text-[9px] ${isDarkMode ? 'text-white/40' : 'text-slate-400'}`}>
+                    @{t.username}
+                  </p>
+                )}
+                {t.months && (
+                  <p className={`text-[10px] uppercase ${isDarkMode ? 'text-white/60' : 'text-slate-400'}`}>
+                    {t.months} {t.months === 1 ? 'MÊS' : 'MESES'}
+                  </p>
+                )}
+              </div>
             </div>
-            <p className={`text-[16px] leading-tight font-black italic ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>
-              "{t.text}"
-            </p>
+            <div className="text-right">
+              <p className="text-sm font-bold text-brand-red">{t.value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+              <p className={`text-[8px] uppercase tracking-widest ${isDarkMode ? 'text-white/40' : 'text-slate-300'}`}>Liberado</p>
+            </div>
           </div>
         ))}
       </div>

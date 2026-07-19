@@ -20,8 +20,9 @@ export interface Testimonial {
   id: string;
   name: string;
   username?: string;
-  text: string;
-  rating: number;
+  text?: string;
+  rating?: number;
+  value: number;
   gender: 'male' | 'female';
   photo: string;
   months?: number;

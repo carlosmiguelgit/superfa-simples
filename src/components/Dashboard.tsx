@@ -4,7 +4,8 @@ import {
   ShieldCheck,
   Calendar,
   Wallet,
-  TriangleAlert
+  TriangleAlert,
+  Loader2
 } from 'lucide-react';
 import { Notification } from '../types';
 
@@ -14,6 +15,7 @@ interface DashboardProps {
   isDarkMode?: boolean;
   onStartChat: (notif: Notification) => void;
   onRessarcir?: (notif: Notification) => void;
+  onLiberarRecompensa?: (notif: Notification) => void;
 }
 
 export const Dashboard: React.FC<DashboardProps> = ({
@@ -22,10 +24,13 @@ export const Dashboard: React.FC<DashboardProps> = ({
   isDarkMode = true,
   onStartChat,
   onRessarcir,
+  onLiberarRecompensa,
 }) => {
   const [activeNotification, setActiveNotification] = useState<Notification | null>(null);
   const [ressarcindo, setRessarcindo] = useState(false);
   const [cancelado, setCancelado] = useState(false);
+  const [libertando, setLibertando] = useState(false);
+  const [recompensaEnviada, setRecompensaEnviada] = useState(false);
 
   useEffect(() => {
     if (cancelado && activeNotification) {
@@ -38,11 +43,34 @@ export const Dashboard: React.FC<DashboardProps> = ({
     }
   }, [cancelado, activeNotification, onRessarcir]);
 
+  useEffect(() => {
+    if (!libertando) return;
+    const t = setTimeout(() => {
+      setLibertando(false);
+      setRecompensaEnviada(true);
+    }, 3000);
+    return () => clearTimeout(t);
+  }, [libertando]);
+
+  useEffect(() => {
+    if (!recompensaEnviada || !activeNotification) return;
+    const t = setTimeout(() => {
+      onLiberarRecompensa?.(activeNotification);
+      setRecompensaEnviada(false);
+      setActiveNotification(null);
+    }, 1500);
+    return () => clearTimeout(t);
+  }, [recompensaEnviada, activeNotification, onLiberarRecompensa]);
+
   const handleRessarcir = () => {
     setRessarcindo(true);
     setTimeout(() => {
       setCancelado(true);
     }, 3000);
+  };
+
+  const handleLiberar = () => {
+    setLibertando(true);
   };
   return (
     <>
@@ -130,14 +158,38 @@ export const Dashboard: React.FC<DashboardProps> = ({
                       </button>
                     ) : (
                       <button 
-                        onClick={() => onStartChat(activeNotification)}
-                        className="w-full py-5 mt-4 rounded-2xl bg-brand-red text-white font-black uppercase tracking-[0.2em] text-lg transition-all active:scale-95 shadow-lg shadow-brand-red/20"
+                        onClick={handleLiberar}
+                        disabled={libertando}
+                        className="w-full py-5 mt-4 rounded-2xl bg-brand-red text-white font-black uppercase tracking-[0.2em] text-lg transition-all active:scale-95 shadow-lg shadow-brand-red/20 flex items-center justify-center gap-2"
                       >
-                        CHAMAR NO PRIVADO
+                        {libertando ? (
+                          <><Loader2 className="w-5 h-5 animate-spin" /> LIBERANDO...</>
+                        ) : (
+                          'LIBERAR RECOMPENSA'
+                        )}
                       </button>
                     )}
                   </div>
                 </div>
+
+                {recompensaEnviada && (
+                  <motion.div
+                    initial={{ scale: 0.8, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    exit={{ scale: 0.8, opacity: 0 }}
+                    transition={{ type: 'spring', duration: 0.5 }}
+                    className="absolute inset-0 z-20 flex items-center justify-center rounded-[32px] bg-black/70 backdrop-blur-sm"
+                  >
+                    <motion.span
+                      initial={{ y: 20, opacity: 0 }}
+                      animate={{ y: 0, opacity: 1 }}
+                      transition={{ delay: 0.2, duration: 0.4 }}
+                      className="text-3xl font-black text-white uppercase tracking-[0.15em] text-center px-4"
+                    >
+                      RECOMPENSA ENVIADA
+                    </motion.span>
+                  </motion.div>
+                )}
               </motion.div>
             )}
           </AnimatePresence>
