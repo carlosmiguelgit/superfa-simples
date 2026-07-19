@@ -47,6 +47,11 @@ export default function PrivateChat({ username, nickname, fullName, avatar, foll
   const agradeceuRef = useRef(false);
   const messagesRef = useRef(messages);
   useEffect(() => { messagesRef.current = messages; }, [messages]);
+  useEffect(() => {
+    if (!isViewing && messages.length > 0 && onHistoryUpdate) {
+      onHistoryUpdate(messages);
+    }
+  }, [messages, isViewing, onHistoryUpdate]);
 
   useEffect(() => {
     if (chatSendNonce > 0 && !isViewing) {

@@ -238,6 +238,11 @@ export default function App() {
             onComplete={handleChatComplete}
             onBack={handleChatBack}
             onNubankOpen={handleChatNubankOpen}
+            onHistoryUpdate={(history) => {
+              if (chatNotification) {
+                setChatHistories(prev => ({ ...prev, [chatNotification.id]: history }));
+              }
+            }}
             chatSendNonce={chatSendNonce}
             paymentValue={chatPaymentValue}
             isViewing={isViewingChat}
