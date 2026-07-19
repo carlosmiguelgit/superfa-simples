@@ -301,12 +301,6 @@ export default function PrivateChat({ username, nickname, fullName, avatar, foll
         </div>
       )}
 
-      {showAceitou && (
-        <div className="shrink-0">
-          <p className="text-[13px] text-zinc-500 text-center font-medium py-2">{nickname} aceitou sua solicitação</p>
-        </div>
-      )}
-
       {messages.length > 0 && !jaRespondeu && !showAceitou && (
         <div className="shrink-0 bg-[#e5e5e5]">
           <div className="flex items-center gap-3 px-6 py-3">
