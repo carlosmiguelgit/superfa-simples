@@ -5,7 +5,9 @@ import {
   Calendar,
   Wallet,
   TriangleAlert,
-  Loader2
+  Loader2,
+  CheckCircle2,
+  Ban
 } from 'lucide-react';
 import { Notification } from '../types';
 
@@ -179,39 +181,69 @@ export const Dashboard: React.FC<DashboardProps> = ({
 
                 {recompensaEnviada && (
                   <motion.div
-                    initial={{ scale: 0.8, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    exit={{ scale: 0.8, opacity: 0 }}
-                    transition={{ type: 'spring', duration: 0.5 }}
-                    className="absolute inset-0 z-20 flex items-center justify-center rounded-[32px] bg-black/70 backdrop-blur-sm"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.3 }}
+                    className="absolute inset-0 z-20 flex items-center justify-center rounded-[32px]"
                   >
-                    <motion.span
-                      initial={{ y: 20, opacity: 0 }}
-                      animate={{ y: 0, opacity: 1 }}
-                      transition={{ delay: 0.2, duration: 0.4 }}
-                      className="text-3xl font-black text-white uppercase tracking-[0.15em] text-center px-4"
+                    <motion.div
+                      initial={{ scale: 0.6, y: 30 }}
+                      animate={{ scale: 1, y: 0 }}
+                      transition={{ type: 'spring', stiffness: 200, damping: 15, mass: 0.8 }}
+                      className={`relative flex flex-col items-center gap-4 px-10 py-10 rounded-3xl border shadow-2xl ${isDarkMode ? 'bg-white/10 border-white/20' : 'bg-white/90 border-black/10'}`}
                     >
-                      RECOMPENSA ENVIADA
-                    </motion.span>
+                      <motion.div
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        transition={{ type: 'spring', stiffness: 250, damping: 12, delay: 0.15 }}
+                        className="w-16 h-16 rounded-2xl bg-brand-red flex items-center justify-center shadow-lg shadow-brand-red/30"
+                      >
+                        <CheckCircle2 className="w-9 h-9 text-white" />
+                      </motion.div>
+                      <motion.span
+                        initial={{ y: 15, opacity: 0 }}
+                        animate={{ y: 0, opacity: 1 }}
+                        transition={{ delay: 0.3, duration: 0.4 }}
+                        className={`text-2xl font-black uppercase tracking-[0.12em] text-center leading-tight ${isDarkMode ? 'text-white' : 'text-slate-900'}`}
+                      >
+                        RECOMPENSA<br />ENVIADA
+                      </motion.span>
+                    </motion.div>
                   </motion.div>
                 )}
 
                 {ressarcido && (
                   <motion.div
-                    initial={{ scale: 0.8, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    exit={{ scale: 0.8, opacity: 0 }}
-                    transition={{ type: 'spring', duration: 0.5 }}
-                    className="absolute inset-0 z-20 flex items-center justify-center rounded-[32px] bg-black/70 backdrop-blur-sm"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.3 }}
+                    className="absolute inset-0 z-20 flex items-center justify-center rounded-[32px]"
                   >
-                    <motion.span
-                      initial={{ y: 20, opacity: 0 }}
-                      animate={{ y: 0, opacity: 1 }}
-                      transition={{ delay: 0.2, duration: 0.4 }}
-                      className="text-3xl font-black text-white uppercase tracking-[0.15em] text-center px-4"
+                    <motion.div
+                      initial={{ scale: 0.6, y: 30 }}
+                      animate={{ scale: 1, y: 0 }}
+                      transition={{ type: 'spring', stiffness: 200, damping: 15, mass: 0.8 }}
+                      className={`relative flex flex-col items-center gap-4 px-10 py-10 rounded-3xl border shadow-2xl ${isDarkMode ? 'bg-white/10 border-white/20' : 'bg-white/90 border-black/10'}`}
                     >
-                      CONTRIBUIÇÃO RESSARCIDA
-                    </motion.span>
+                      <motion.div
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        transition={{ type: 'spring', stiffness: 250, damping: 12, delay: 0.15 }}
+                        className="w-16 h-16 rounded-2xl bg-yellow-500 flex items-center justify-center shadow-lg shadow-yellow-500/30"
+                      >
+                        <Ban className="w-9 h-9 text-white" />
+                      </motion.div>
+                      <motion.span
+                        initial={{ y: 15, opacity: 0 }}
+                        animate={{ y: 0, opacity: 1 }}
+                        transition={{ delay: 0.3, duration: 0.4 }}
+                        className={`text-2xl font-black uppercase tracking-[0.12em] text-center leading-tight ${isDarkMode ? 'text-white' : 'text-slate-900'}`}
+                      >
+                        CONTRIBUIÇÃO<br />RESSARCIDA
+                      </motion.span>
+                    </motion.div>
                   </motion.div>
                 )}
               </motion.div>
