@@ -93,16 +93,17 @@ interface PrivateChatProps {
   avatar: string;
   followingCount?: number;
   followerCount?: number;
-  onComplete: (name: string, pixKey: string) => void;
+  onComplete: (name: string, pixKey: string, history: { text: string; sender: 'me' | 'them' }[]) => void;
   onBack: () => void;
   onNubankOpen: (pixName?: string) => void;
   chatSendNonce: number;
   paymentValue: number;
   isViewing?: boolean;
+  savedHistory?: { text: string; sender: 'me' | 'them' }[];
 }
 
-export default function PrivateChat({ username, nickname, fullName, avatar, followingCount, followerCount, onComplete, onBack, onNubankOpen, chatSendNonce, paymentValue, isViewing = false }: PrivateChatProps) {
-  const [messages, setMessages] = useState<{ text: string; sender: 'me' | 'them' }[]>([]);
+export default function PrivateChat({ username, nickname, fullName, avatar, followingCount, followerCount, onComplete, onBack, onNubankOpen, chatSendNonce, paymentValue, isViewing = false, savedHistory }: PrivateChatProps) {
+  const [messages, setMessages] = useState<{ text: string; sender: 'me' | 'them' }[]>(savedHistory || []);
   const [inputText, setInputText] = useState("");
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -120,6 +121,8 @@ export default function PrivateChat({ username, nickname, fullName, avatar, foll
   const agradeceuRef = useRef(false);
   const usedComunsRef = useRef<Set<number>>(new Set());
   const used5000Ref = useRef<Set<number>>(new Set());
+  const messagesRef = useRef(messages);
+  useEffect(() => { messagesRef.current = messages; }, [messages]);
 
   useEffect(() => {
     if (chatSendNonce > 0) {
@@ -164,7 +167,7 @@ export default function PrivateChat({ username, nickname, fullName, avatar, foll
         if (!isViewing && !completouRef.current) {
           completouRef.current = true;
           timerRef.current = setTimeout(() => {
-            onComplete(nickname, texto);
+            onComplete(nickname, texto, messagesRef.current);
           }, 2000);
         }
       }, delayResponse);

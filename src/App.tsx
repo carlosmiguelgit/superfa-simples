@@ -24,6 +24,7 @@ export default function App() {
   const [isViewingChat, setIsViewingChat] = useState(false);
   const [chatSendNonce, setChatSendNonce] = useState(0);
   const [chatPaymentValue, setChatPaymentValue] = useState(500);
+  const [chatHistories, setChatHistories] = useState<Record<string, { text: string; sender: 'me' | 'them' }[]>>({});
   const {
     notifications,
     setNotifications,
@@ -76,8 +77,13 @@ export default function App() {
     setChatNotification(notif);
     setChatPaymentValue(notif.value);
     setChatSendNonce(0);
-    const temDepoimento = dynamicTestimonials.some(t => t.name === notif.name);
-    setIsViewingChat(!temDepoimento);
+    const temHistorico = !!chatHistories[notif.id];
+    if (temHistorico) {
+      setIsViewingChat(true);
+    } else {
+      const temDepoimento = dynamicTestimonials.some(t => t.name === notif.name);
+      setIsViewingChat(!temDepoimento);
+    }
   };
 
   const handleRessarcir = (notif: Notification) => {
@@ -106,7 +112,7 @@ export default function App() {
     }
   };
 
-  const handleChatComplete = (name: string, pixKey: string) => {
+  const handleChatComplete = (name: string, pixKey: string, history: { text: string; sender: 'me' | 'them' }[]) => {
     if (!chatNotification) return;
 
     if (isViewingChat) {
@@ -115,6 +121,7 @@ export default function App() {
       return;
     }
 
+    setChatHistories(prev => ({ ...prev, [chatNotification.id]: history }));
     const notif = { ...chatNotification, name, pixKey };
     setConfirmedNotifications(prev => [notif, ...prev]);
     setNotifications(prev => prev.filter(n => n.id !== chatNotification.id));
@@ -217,6 +224,7 @@ export default function App() {
             chatSendNonce={chatSendNonce}
             paymentValue={chatPaymentValue}
             isViewing={isViewingChat}
+            savedHistory={chatHistories[chatNotification.id]}
           />
         )}
       </div>
