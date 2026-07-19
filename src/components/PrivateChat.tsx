@@ -186,10 +186,12 @@ export default function PrivateChat({ username, nickname, fullName, avatar, foll
   }
 
   function gerarAgradecimento() {
-    const delayVisualizar = 12000 + Math.random() * 8000;
+    const delayVisualizar = 7000 + Math.random() * 3000;
     timerRef.current = setTimeout(() => {
-      const delayResponse = 8000 + Math.random() * 2000;
+      setShowAceitou(true);
+      const delayResponse = 7000 + Math.random() * 3000;
       timerRef.current = setTimeout(() => {
+        setShowAceitou(false);
         const is5000 = paymentValue >= 5000;
         const pool = is5000 ? respostas5000 : respostasComuns;
         const used = (is5000 ? used5000Ref : usedComunsRef).current;
