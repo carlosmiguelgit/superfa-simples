@@ -313,7 +313,7 @@ export default function PrivateChat({ username, nickname, fullName, avatar, foll
         </div>
       )}
 
-      {(messages.length === 0 || showAceitou || jaRespondeu) && !isViewing && (
+      {(messages.length === 0 || showAceitou || jaRespondeu) && (
         <div className="shrink-0 px-3 pb-3 pt-1.5">
           <div className="bg-[#eeeeee] rounded-full flex items-center gap-2 px-3.5 py-2.5">
             {messages.length > 0 && (
