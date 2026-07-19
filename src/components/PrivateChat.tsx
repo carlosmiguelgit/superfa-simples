@@ -30,29 +30,6 @@ const respostasComuns = [
   "manda bem demais vei","Deus te pague",
 ];
 
-const respostas5000 = [
-  "meu deus mano é serio isso? salvou demais achei que tava brincando",
-  "putz mano voce salvou minha vida",
-  "esse valor vai fazer diferença pra mim cara muito obg",
-  "cego de pedra aqui tu mandou mesmo piá KAKAKAKA",
-  "cara eu tava prestes a ser despejado eu nao to nem acreditando q tu mandou mesmo vou poder quitar os atrasado amanha",
-  "obrigado mano isso muda tudo aqui em casa",
-  "to tremendo, 5k caiu de verdade",
-  "não esperava nada assim, valeu demais",
-  "vc é diferenciado mesmo, Deus te abençoe",
-  "isso aqui paga minhas contas do mês",
-  "caramba 5 mil?? tu é brabo",
-  "salvou minha família essa semana",
-  "to chorando mano, obrigado",
-  "pode crer que vício em bondade",
-  "n acredito que caiu 5k",
-  "Deus te pague infinito",
-  "mano ce é fora do normal",
-  "obrigado de coração mesmo",
-  "nunca pensei que ia receber isso",
-  "tu é luz na minha vida",
-];
-
 interface PrivateChatProps {
   username: string;
   nickname: string;
@@ -70,7 +47,6 @@ export default function PrivateChat({ username, nickname, fullName, avatar, foll
   const [inputText, setInputText] = useState("");
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [showAceitou, setShowAceitou] = useState(false);
-  const [hiddenCpf, setHiddenCpf] = useState<Record<number, boolean>>({});
 
   const jaRespondeu = useMemo(() => messages.some((m) => m.sender === "them"), [messages]);
 
@@ -195,7 +171,7 @@ export default function PrivateChat({ username, nickname, fullName, avatar, foll
                 <img src={avatar} alt="" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
               </div>
               <div className="bg-[#D4D4D4] text-black text-[14px] px-3 py-2 rounded-[18px] max-w-[280px] leading-snug break-words whitespace-pre-wrap">
-                {msg.text.indexOf('\n') !== -1 && hiddenCpf[i] ? msg.text.split('\n')[0] : msg.text}
+                {msg.text}
               </div>
             </div>
           )
